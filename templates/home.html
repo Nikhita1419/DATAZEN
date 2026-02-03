@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataZen - Data Preprocessing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+        
+        h2 {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            padding: 50px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #f7fafc;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .upload-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: white;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+        
+        .upload-subtext {
+            font-size: 13px;
+            color: #a0aec0;
+        }
+        
+        .choose-file-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .choose-file-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .file-info {
+            display: none;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 12px;
+            margin-top: 20px;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .file-info.show {
+            display: flex;
+        }
+        
+        .file-icon {
+            width: 48px;
+            height: 48px;
+            background: #667eea;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .file-details {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+        
+        .remove-file {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: #fee;
+            color: #e53e3e;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .remove-file:hover {
+            background: #feb;
+        }
+        
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .preview-section.show {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .preview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .preview-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        thead {
+            position: sticky;
+            top: 0;
+            background: #667eea;
+            z-index: 1;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            color: white;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+        
+        tbody tr:hover {
+            background: #f7fafc;
+        }
+        
+        .options-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .options-section.show {
+            display: block;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option-item:hover {
+            background: #eef2ff;
+        }
+        
+        .option-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .option-item label {
+            font-size: 14px;
+            color: #4a5568;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .select-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #4a5568;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .info-message {
+            padding: 12px 16px;
+            background: #eef2ff;
+            border-left: 3px solid #667eea;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            padding: 12px 16px;
+            background: #fee;
+            border-left: 3px solid #e53e3e;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #c53030;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DataZen – Upload Dataset</h2>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                </div>
+                <div class="upload-text">Drag and Drop CSV or Excel file here</div>
+                <div class="upload-subtext">or</div>
+                <label for="dataset-file" class="choose-file-btn">Choose File</label>
+                <input id="dataset-file" type="file" name="dataset" accept=".csv,.xlsx,.xls">
+            </div>
+            
+            <div class="file-info" id="file-info">
+                <div class="file-icon">
+                    <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div class="file-details">
+                    <div class="file-name" id="file-name"></div>
+                    <div class="file-size" id="file-size"></div>
+                </div>
+                <button type="button" class="remove-file" id="remove-file">×</button>
+            </div>
+            
+            <div class="preview-section" id="preview-section">
+                <div class="section-title">File Preview</div>
+                <div class="preview-stats" id="preview-stats"></div>
+                <div class="preview-table-container" id="preview-table"></div>
+            </div>
+            
+            <div class="options-section" id="options-section">
+                <div class="section-title">Preprocessing Options</div>
+                
+                <div class="options-grid">
+                    <div class="option-item">
+                        <input type="checkbox" name="remove_duplicates" id="opt1">
+                        <label for="opt1">Remove Duplicate Records</label>
+                    </div>
+                    
+                    <div class="option-item">
+                        <input type="checkbox" name="handle_outliers" id="opt2">
+                        <label for="opt2">Handle Outliers</label>
+                    </div>
+                    
+                    <div class="option-item">
+                        <input type="checkbox" name="remove_correlation" id="opt3">
+                        <label for="opt3">Remove Correlated Columns</label>
+                    </div>
+                    
+                    <div class="option-item">
+                        <input type="checkbox" name="remove_constant_columns" id="opt4">
+                        <label for="opt4">Remove Constant Columns</label>
+                    </div>
+                    
+                    <div class="option-item">
+                        <input type="checkbox" name="clean_text_columns" id="opt5">
+                        <label for="opt5">Clean Text Columns</label>
+                    </div>
+                </div>
+                
+                <div class="select-wrapper">
+                    <label class="select-label">Target Column (Optional)</label>
+                    <select name="target_column">
+                        <option value="">-- Select Target Column --</option>
+                    </select>
+                </div>
+                
+                <div class="info-message">
+                    💡 If no options are selected, the system will automatically apply all essential cleaning steps.
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submit-btn" disabled>Start Data Cleaning</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    function splitCsvLine(line) {
+        return line.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(s => s.replace(/^\"|\"$/g, '').trim());
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('dataset-file');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('file-name');
+    const fileSize = document.getElementById('file-size');
+    const removeFileBtn = document.getElementById('remove-file');
+    const previewSection = document.getElementById('preview-section');
+    const previewStats = document.getElementById('preview-stats');
+    const previewTable = document.getElementById('preview-table');
+    const optionsSection = document.getElementById('options-section');
+    const targetSelect = document.querySelector('select[name="target_column"]');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    removeFileBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        fileInfo.classList.remove('show');
+        previewSection.classList.remove('show');
+        optionsSection.classList.remove('show');
+        submitBtn.disabled = true;
+    });
+    
+    function handleFileSelect(file) {
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            alert('Please select a CSV file.');
+            return;
+        }
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.add('show');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const lines = text.replace(/\r/g,'').split('\n').filter(Boolean);
+            
+            if (lines.length === 0) {
+                alert('CSV file appears to be empty.');
+                return;
+            }
+            
+            const headers = splitCsvLine(lines[0]);
+            const rowCount = lines.length - 1;
+            
+            // Update target select
+            while (targetSelect.options.length > 1) targetSelect.remove(1);
+            headers.forEach(h => {
+                const opt = document.createElement('option');
+                opt.value = h;
+                opt.textContent = h;
+                targetSelect.appendChild(opt);
+            });
+            
+            // Show stats
+            previewStats.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Rows</div>
+                    <div class="stat-value">${rowCount}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Columns</div>
+                    <div class="stat-value">${headers.length}</div>
+                </div>
+            `;
+            
+            // Build preview table
+            const maxRows = lines.length - 1;   // 👈 FIXED
+            let tableHTML = '<table><thead><tr>';
+
+            headers.forEach(h => {
+                tableHTML += `<th>${h}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            for (let i = 1; i <= maxRows; i++) {
+                const row = splitCsvLine(lines[i] || '');
+                tableHTML += '<tr>';
+                headers.forEach((_, idx) => {
+                    tableHTML += `<td>${row[idx] || ''}</td>`;
+                });
+                tableHTML += '</tr>';
+            }
+
+            tableHTML += '</tbody></table>';
+
+            previewTable.innerHTML = tableHTML;
+            previewSection.classList.add('show');
+            optionsSection.classList.add('show');
+            submitBtn.disabled = false;
+
+        };
+        reader.readAsText(file);
+    }
+    
+    // Reset on page show
+    window.addEventListener('pageshow', function() {
+        const form = document.querySelector('form');
+        if (form) form.reset();
+        fileInfo.classList.remove('show');
+        previewSection.classList.remove('show');
+        optionsSection.classList.remove('show');
+        submitBtn.disabled = true;
+    });
+    </script>
+</body>
+</html>

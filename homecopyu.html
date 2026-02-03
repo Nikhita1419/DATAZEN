@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DataZen - Cleaning Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 30px;
+        }
+        h2 {
+            margin-top: 30px;
+        }
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        }
+        ul {
+            line-height: 1.8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        button {
+            padding: 8px 14px;
+            margin-right: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Data Cleaning Output</h1>
+
+<!-- 📊 DATASET SUMMARY -->
+<div class="section">
+    <h2>📊 Dataset Summary</h2>
+
+    <h3>Before Cleaning</h3>
+    <ul>
+        <li><strong>Rows:</strong> {{ before_summary.rows }}</li>
+        <li><strong>Columns:</strong> {{ before_summary.columns }}</li>
+        <li><strong>Missing Values:</strong> {{ before_summary.missing }}</li>
+        <li><strong>Duplicate Rows:</strong> {{ before_summary.duplicates }}</li>
+    </ul>
+
+    <h3>After Cleaning</h3>
+    <ul>
+        <li><strong>Rows:</strong> {{ after_summary.rows }}</li>
+        <li><strong>Columns:</strong> {{ after_summary.columns }}</li>
+        <li><strong>Missing Values:</strong> {{ after_summary.missing }}</li>
+    </ul>
+</div>
+
+<!-- 📉 CLEANING IMPACT SUMMARY -->
+<div class="section">
+    <h2>📉 Cleaning Impact Summary</h2>
+
+    <ul>
+        <li><strong>Rows Removed:</strong> {{ rows_removed }}</li>
+        <li><strong>Columns Removed:</strong> {{ columns_removed }}</li>
+        <li><strong>Data Reduction:</strong> {{ data_reduction_percent }}%</li>
+    </ul>
+
+    <p style="color:#555; font-size:14px;">
+        Data size reduced by {{ data_reduction_percent }}% while preserving essential features.
+    </p>
+</div>
+
+<!-- 🧾 CLEANED DATA PREVIEW -->
+<div class="section">
+    <h2>Cleaned Data Preview</h2>
+    {{ table | safe }}
+</div>
+
+<!-- 🧹 CLEANING ACTIONS -->
+<div class="section">
+    <h2>Cleaning Actions Performed</h2>
+    <ul>
+        {% for action in actions %}
+            <li>{{ action }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- 🧠 EXPLANATIONS -->
+<div class="section">
+    <h2>🧠 Data Cleaning Explanation</h2>
+    <ul>
+        {% for explanation in explanations %}
+            <li>{{ explanation }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- 📊 VISUALIZATIONS -->
+<div class="section">
+    <h2>📊 Data Visualizations</h2>
+
+    {% if hist_before_path %}
+        <h3>Histogram – Before Cleaning</h3>
+        <p>
+            <b>What does this show?</b><br>
+            This histogram represents how the data values were distributed before cleaning.
+        </p>
+        <img src="/{{ hist_before_path }}" width="650">
+    {% endif %}
+
+    {% if hist_after_path %}
+        <h3>Histogram – After Cleaning</h3>
+        <p>
+            <b>What does this show?</b><br>
+            This histogram shows the data distribution after cleaning.
+        </p>
+        <img src="/{{ hist_after_path }}" width="650">
+    {% endif %}
+
+    {% if box_before_path %}
+        <h3>Box Plot – Before Cleaning</h3>
+        <p>
+            <b>What does this show?</b><br>
+            This box plot highlights the presence of outliers.
+        </p>
+        <img src="/{{ box_before_path }}" width="650">
+    {% endif %}
+
+    {% if box_after_path %}
+        <h3>Box Plot – After Cleaning</h3>
+        <p>
+            <b>What does this show?</b><br>
+            This box plot shows reduced outliers after cleaning.
+        </p>
+        <img src="/{{ box_after_path }}" width="650">
+    {% endif %}
+
+    {% if heatmap_before_path %}
+        <h3>Correlation Heatmap – Before Cleaning</h3>
+        <p>
+            <b>What does this show?</b><br>
+            This heatmap displays feature relationships before cleaning.
+        </p>
+        <img src="/{{ heatmap_before_path }}" width="650">
+    {% endif %}
+
+    {% if heatmap_after_path %}
+        <h3>Correlation Heatmap – After Cleaning</h3>
+        <p>
+            <b>What does this show?</b><br>
+            This heatmap shows reduced correlations after cleaning.
+        </p>
+        <img src="/{{ heatmap_after_path }}" width="650">
+    {% endif %}
+</div>
+
+<!-- ⬇ DOWNLOAD SECTION -->
+<div class="section">
+    <h2>⬇ Download Cleaned Dataset</h2>
+    <a href="/download/csv">
+        <button>Download CSV</button>
+    </a>
+    <a href="/download/json">
+        <button>Download JSON</button>
+    </a>
+    <a href="/download/excel">
+        <button>Download Excel</button>
+    </a>
+</div>
+
+</body>
+</html>
